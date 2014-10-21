@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- From: file:/E:/GoogleDrive/Synced_docs/Subjects/Mobile%20Security/AndroidKeyLogger-master/app/src/main/res/values-land/dimens.xml -->
+    <eat-comment />
+
+    <dimen name="key_height">46dip</dimen>
+
+</resources>
