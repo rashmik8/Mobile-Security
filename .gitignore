@@ -1,0 +1,34 @@
+
+#built application files
+keylogger-master/*.apk
+keylogger-master/*.ap_
+
+# files for the dex VM
+keylogger-master/*.dex
+
+# Java class files
+keylogger-master/*.class
+
+# generated files
+keylogger-master/bin/
+keylogger-master/gen/
+
+# Local configuration file (sdk path, etc)
+keylogger-master/local.properties
+
+# Windows thumbnail db
+Thumbs.db
+
+# OSX files
+.DS_Store
+
+# Eclipse project files
+keylogger-master/.classpath
+keylogger-master/.project
+
+# Android Studio
+keylogger-master/.idea
+#.idea/workspace.xml - remove # and delete .idea if it better suit your needs.
+keylogger-master/.gradle
+keylogger-master/build/
+keylogger-master/app/build/
