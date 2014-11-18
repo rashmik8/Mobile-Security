@@ -5,8 +5,10 @@ class ProcessDump:
 	def sendData(self, output):
 		if "secure.splitwise.com" in output:
 			appName= "Splitwise";
-			epoch_time= int(time.time())
-		urllib2.urlopen('http://1-dot-ninjabotscmu.appspot.com/ninjabotscmu?data='+appName+"+"+str(epoch_time))
+		if "chase" in output:
+			appName= "Chase Bank";
+		epoch_time= int(time.time())
+		urllib2.urlopen('http://1-dot-ninjabotscmu.appspot.com/ninjabotscmu?data='+appName+"&timeStamp="+str(epoch_time))
 
 winDump = subprocess.Popen("windump -i 3 -s 0 -w C:/Users/PushkarJ/Desktop/DumpFile01.pcap",stdout=subprocess.PIPE)
 sleep = subprocess.Popen("sleep 10",stdin=winDump.stdout, stdout=subprocess.PIPE)
