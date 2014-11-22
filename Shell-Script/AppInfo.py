@@ -1,4 +1,4 @@
 class AppInfo:
-	def __init__(self, serverIP, timestamp)
+	def __init__(self, serverIP, appName)
 		self.serverIP = serverIP
-		self.timestamp = timestamp
+		self.appName = appName
