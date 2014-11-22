@@ -5,6 +5,9 @@ class ProcessDump:
 	def getAppName(self, Url):
 		if "secure.splitwise.com" in Url:
 			return "Splitwise"
+		if "www.chase.com" in output:
+			return "Chase Bank";
+
 			#epoch_time= int(time.time())
 		#urllib2.urlopen('http://1-dot-ninjabotscmu.appspot.com/ninjabotscmu?data='+appName+"+"+str(epoch_time))
 
