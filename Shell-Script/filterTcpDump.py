@@ -44,7 +44,6 @@ oldAppName =""
 appName=""
 epoch_time=""
 while line:
-		line = f.readline()
 		if "Epoch Time:" in line:
 			timestamp = line.split(":")
 			epoch_time = timestamp[1].split()[0]
@@ -60,15 +59,16 @@ while line:
 			if knownAppName != None:
 				appName = knownAppName
 			IPAppDict[IP]=appName
-			if "Internet Protocol Version 4" in line:
-				line = f.readline()
-				IPHeader = line.split()
-				serverIP = IPHeader[1][4:]
-				if serverIP in dict.keys():
-					appName = IPAppDict[serverIP]
-				if oldAppName != appName:
-					urllib2.urlopen('http://1-dot-ninjabotscmu.appspot.com/ninjabotscmu?data='+oldAppName+"+"+str(epoch_time))
-					oldAppName = appName
+		if "Internet Protocol Version 4" in line:
+			IPHeader = line.split()
+			serverIP = IPHeader[5]
+			#sourceIP = IPHeader[8] check either case
+			if serverIP in IPAppDict.keys():
+				appName = IPAppDict[serverIP]
+			if oldAppName != appName:
+				urllib2.urlopen('http://1-dot-ninjabotscmu.appspot.com/ninjabotscmu?data='+oldAppName+"+"+str(epoch_time))
+				oldAppName = appName
+		line = f.readline()
 print appName
 print epoch_time
 print int(time.time())
