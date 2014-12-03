@@ -32,3 +32,5 @@ keylogger-master/.idea
 keylogger-master/.gradle
 keylogger-master/build/
 keylogger-master/app/build/
+
+*.jar
