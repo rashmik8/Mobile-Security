@@ -74,8 +74,8 @@ def mainPart():
 	epoch_time= ""
 	while line:
 		if "Epoch Time:" in line:
-			timestamp = line.split(":")
-			epoch_time = timestamp[1].split()[0]
+			timeStamp = line.split(":")
+			epoch_time = timeStamp[1].split()[0]
 		if "Answers" in line:
 			line = f.readline()
 			dnsAnswer = line.split()
@@ -118,16 +118,16 @@ def mainPart():
 			if appName is not "" and oldAppName is not appName:
 				print "SourceIP = "+sourceIP
 				IPAppSrcDict[sourceIP] = appName
-				fileWrite.write('http://1-dot-nbotstwo.appspot.com/ninjabotscmu?appName='+oldAppName+"&timestamp="+str(epoch_time)+"&srcIp="+sourceIP)
+				fileWrite.write('http://1-dot-nbotstwo.appspot.com/ninjabotscmu?appName='+oldAppName+"&timeStamp="+str(epoch_time)+"&srcIP="+sourceIP)
 				fileWrite.write('\n')
-				urllib2.urlopen('http://1-dot-nbotstwo.appspot.com/ninjabotscmu?appName='+oldAppName+"&timestamp="+str(epoch_time)+"&srcIp="+sourceIP)
+				urllib2.urlopen('http://1-dot-nbotstwo.appspot.com/ninjabotscmu?appName='+oldAppName+"&timeStamp="+str(epoch_time)+"&srcIP="+sourceIP)
 		line = f.readline()
 
 	# Pass all the state information obtained till now: source IP vs appName to server
 	for srcIP, appName in IPAppSrcDict.iteritems():
-		fileWrite.write('http://1-dot-nbotstwo.appspot.com/ninjabotscmu?appName='+appName+"&timestamp="+str(epoch_time)+"&srcIp="+srcIP)
+		fileWrite.write('http://1-dot-nbotstwo.appspot.com/ninjabotscmu?appName='+appName+"&timeStamp="+str(epoch_time)+"&srcIP="+srcIP)
 		fileWrite.write('\n')
-		urllib2.urlopen('http://1-dot-nbotstwo.appspot.com/ninjabotscmu?appName='+appName+"&timestamp="+str(epoch_time)+"&srcIp="+srcIP)
+		urllib2.urlopen('http://1-dot-nbotstwo.appspot.com/ninjabotscmu?appName='+appName+"&timeStamp="+str(epoch_time)+"&srcIP="+srcIP)
 	
 	f.close()
 if sys.argv[1] == "t":
