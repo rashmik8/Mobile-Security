@@ -1,3 +1,9 @@
+#####################
+## Way to use:
+## python filterTcpDump_mac.py t: live capture
+## python filterTcpDump_mac.py ~/Documents/chase.pcap: parse input file 
+#####################
+
 import subprocess
 import urllib2
 import time
@@ -30,6 +36,11 @@ def getAppName(Url):
 		return "SnapChat"
 	if "mb.mbankhost" in Url:
 		return "PNC"
+	if "nflx" in Url:
+		return "Netflix"
+	if "myfitnesspal" in Url:
+		return "MyFitnessPal"
+
 
 ###################
 ## t option: live capture
